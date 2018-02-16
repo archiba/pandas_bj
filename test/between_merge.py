@@ -3,7 +3,7 @@ from unittest import TestCase
 import pandas
 from nose.tools import assert_true, assert_false, raises
 
-from pandas_bj.between import Between
+from pandas_bj.between import Between, GT, GE, LT, LE
 from pandas_bj.between_merge import merge as bmerge
 
 
@@ -261,3 +261,35 @@ class TestBetweenMerge(TestCase):
     @raises(KeyError)
     def test_inner_fail_key4(self):
         result = bmerge(self.df1, self.df2, Between('s', 'e', True, True), Between('id1', 'id2', True, True))
+
+    def test_inner_id2ll_gt(self):
+        result = bmerge(self.df1, self.df2, ['id1', 'id2', GT('s')], ['id3', 'id4', 'v'])
+        print(result)
+        for idx, row in result.iterrows():
+            assert_true(row['id1'] == row['id3'])
+            assert_true(row['id2'] == row['id4'])
+            assert_true(row['s'] < row['v'], f'row: {row}')
+
+    def test_inner_id2ll_ge(self):
+        result = bmerge(self.df1, self.df2, ['id1', 'id2', GE('s')], ['id3', 'id4', 'v'])
+        print(result)
+        for idx, row in result.iterrows():
+            assert_true(row['id1'] == row['id3'])
+            assert_true(row['id2'] == row['id4'])
+            assert_true(row['s'] <= row['v'], f'row: {row}')
+
+    def test_inner_id2ll_lt(self):
+        result = bmerge(self.df1, self.df2, ['id1', 'id2', LT('e')], ['id3', 'id4', 'v'])
+        print(result)
+        for idx, row in result.iterrows():
+            assert_true(row['id1'] == row['id3'])
+            assert_true(row['id2'] == row['id4'])
+            assert_true(row['e'] > row['v'], f'row: {row}')
+
+    def test_inner_id2ll_le(self):
+        result = bmerge(self.df1, self.df2, ['id1', 'id2', LE('e')], ['id3', 'id4', 'v'])
+        print(result)
+        for idx, row in result.iterrows():
+            assert_true(row['id1'] == row['id3'])
+            assert_true(row['id2'] == row['id4'])
+            assert_true(row['e'] >= row['v'], f'row: {row}')

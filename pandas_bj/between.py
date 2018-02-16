@@ -1,4 +1,4 @@
-from typing import Any, Hashable, Callable, Union, List
+from typing import Any, Hashable, Callable, Union, List, Optional
 from abc import ABCMeta, abstractmethod
 import pandas
 from pandas import DataFrame
@@ -177,13 +177,33 @@ class Between(CustomColumn):
 
     If `f_open=True`, `BETWEEN 2 and 5` doesn't contain `2` but it contains `2.0001`.
 
+    If you specific None for `f`, then no lower condition is considered.
+    Conversely, None for `t` do comparison without higher condition.
+
+    If you want something like `JOIN x WHERE x.a < y.b`,
+    then you can do
+
+    ```
+    Between(f='a', t=None, f_open=True)
+    ```
+
+    For `JOIN x WHERE x.a >= y.b`,
+    then you can do
+
+    ```
+    Between(f=None, t='a', t_open=False)
+    ```
+
     If the column that is specified as `f` contains `NaN`, it'll considered as `-inf`.
     Conversely, `NaN` in `t` column, it'll considered as `+inf`.
     And no differences between `NaN` and `f_open` and `t_open` because infinite don't have end originally.
 
     '''
 
-    def __init__(self, f: Hashable, t: Hashable, f_open: bool = False, t_open: bool = False):
+    def __init__(self, f: Optional[Hashable] = None, t: Optional[Hashable] = None,
+                 f_open: bool = False, t_open: bool = False):
+        if f is None and t is None:
+            raise ValueError('You can not set None for both f and t.')
         self.f = f
         self.t = t
         self.f_open = f_open
@@ -199,16 +219,40 @@ class Between(CustomColumn):
         :param df: pandas.DataFrame
         :return: pandas.Series of `Range`.
         '''
-        if self.f not in df.columns:
+        if self.f is not None and self.f not in df.columns:
             raise KeyError(self.f)
-        if self.t not in df.columns:
+        if self.t is not None and self.t not in df.columns:
             raise KeyError(self.t)
 
-        return df[[self.f, self.t]].apply(lambda v: Range(v[self.f], v[self.t], self.f_open, self.t_open), axis=1)
+        columns = []
+        if self.f is not None:
+            columns.append(self.f)
+        if self.t is not None:
+            columns.append(self.t)
+
+        return df[columns].apply(lambda v: Range(v[self.f] if self.f is not None else None,
+                                                 v[self.t] if self.t is not None else None,
+                                                 self.f_open, self.t_open), axis=1)
 
     def column_check(self, columns: List[Any]) -> bool:
-        if self.f not in columns:
+        if self.f is not None and self.f not in columns:
             return False
-        if self.t not in columns:
+        if self.t is not None and self.t not in columns:
             return False
         return True
+
+class GT(Between):
+    def __init__(self, f: Hashable):
+        super(GT, self).__init__(f, None, True, False)
+
+class GE(Between):
+    def __init__(self, f: Hashable):
+        super(GE, self).__init__(f, None, False, False)
+
+class LT(Between):
+    def __init__(self, t: Hashable):
+        super(LT, self).__init__(None, t, False, True)
+
+class LE(Between):
+    def __init__(self, t: Hashable):
+        super(LE, self).__init__(None, t, False, False)

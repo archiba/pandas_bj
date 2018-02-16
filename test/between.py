@@ -5,7 +5,7 @@ import numpy
 import pandas
 from nose.tools import eq_, assert_true, assert_false, raises
 
-from pandas_bj.between import Range, Between, CustomColumn
+from pandas_bj.between import Range, Between, CustomColumn, GT, GE, LT, LE
 
 
 class TestRange(TestCase):
@@ -335,6 +335,27 @@ class TestBetween(TestCase):
         eq_(b.f_open, False)
         eq_(b.t_open, True)
 
+        b = Between(None, 'b')
+        eq_(b.f, None)
+        eq_(b.t, 'b')
+        eq_(b.f_open, False)
+        eq_(b.t_open, False)
+
+        b = Between('a', None)
+        eq_(b.f, 'a')
+        eq_(b.t, None)
+        eq_(b.f_open, False)
+        eq_(b.t_open, False)
+
+        eq_(GT('a').__dict__, Between('a', None, True, False).__dict__)
+        eq_(GE('a').__dict__, Between('a', None, False, False).__dict__)
+        eq_(LT('b').__dict__, Between(None, 'b', False, True).__dict__)
+        eq_(LE('b').__dict__, Between(None, 'b', False, False).__dict__)
+
+    @raises(ValueError)
+    def test_init_fail(self):
+        b = Between(None, None)
+
     def test_build(self):
         df = pandas.DataFrame({'a': [1,2,3], 'b': [5,6,7]})
         b = Between('a', 'b')
@@ -357,6 +378,20 @@ class TestBetween(TestCase):
         eq_(r.range_to, 6)
         eq_(r.from_opened, False)
         eq_(r.to_opened, True)
+
+        b = Between(None, 'b')
+        r = b(df)[1]
+        eq_(r.range_from, None)
+        eq_(r.range_to, 6)
+        eq_(r.from_opened, False)
+        eq_(r.to_opened, False)
+
+        b = Between('a', None)
+        r = b(df)[1]
+        eq_(r.range_from, 2)
+        eq_(r.range_to, None)
+        eq_(r.from_opened, False)
+        eq_(r.to_opened, False)
 
     @raises(KeyError)
     def test_build_fail1(self):
