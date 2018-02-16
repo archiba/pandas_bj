@@ -10,6 +10,8 @@ In this library, supported comparison conditions are:
 - `JOIN yyy WHERE yyy.a < xxx.b`
 - `JOIN yyy WHERE yyy.a <= xxx.b`
 
+Please refer [Performance](#Performance) if you need performance information.
+
 # Latest version
 
 0.0.2
@@ -304,3 +306,31 @@ LE
 - List of ints
     - `[0, 1]` to use sort for first and second join keys
     - `[]` equals to `False`
+
+# Performance
+
+#### Performance test
+
+- Randomly generate X and Y data frames.
+- Both X and Y has integer id1: (0, 100] and integer id2: (0, 50].
+- X has float s: (0, 1000] and e: (0, 1000] and e >= s.
+- Y has float v: (0, 1000].
+- Use left_on=`['id1', 'id2', pandas_bj.Between('s', 'e')]`, right_on=`['id1', 'id2', 'v']`
+
+See `test/performance.py` for more information.
+
+#### Result
+
+| X record count | Y record count | use Sort | Time in sec | Joined Y record count per X |
+| :--- | :--- | --- | :--- | :--- |
+|100 | 1,000 | False | 0.1499 | 1.0 |
+|100 | 1,000 | True | 0.0614 | 1.0 |
+|1,000 | 10,000 | False | 8.1311 | 1.4669 |
+|1,000 | 10,000 | True | 0.3608 | 1.4669 |
+|10,000 | 100,000 | True | 3.843 | 6.0406 |
+|10,000 | 1,000,000 | True | 28.5253 | 51.8505 |
+
+When you need to Join `1,000,000` X records with `10,000` Y records with `BETWEEN`,
+and it is expected that `50` X records are joined per a Y record in average,
+
+pandas-bj can create result in 30 seconds.
