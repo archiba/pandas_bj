@@ -10,6 +10,23 @@ In this library, supported comparison conditions are:
 - `JOIN yyy WHERE yyy.a < xxx.b`
 - `JOIN yyy WHERE yyy.a <= xxx.b`
 
+# Latest version
+
+0.0.2
+
+# Requirements
+
+- python >= 3.6
+- nose >= 1.3.7
+- numpy >= 1.14.0
+- pandas >= 0.22.0
+
+# Install
+
+```bash
+pip install pandas-bj
+```
+
 # How to use
 For BETWEEN,
 
