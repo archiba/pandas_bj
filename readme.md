@@ -10,7 +10,7 @@ In this library, supported comparison conditions are:
 - `JOIN yyy WHERE yyy.a < xxx.b`
 - `JOIN yyy WHERE yyy.a <= xxx.b`
 
-Please refer [Performance](#Performance) if you need performance information.
+Please refer [Performance](#performance) if you need performance information.
 
 # Latest version
 
