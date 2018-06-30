@@ -116,13 +116,16 @@ def reindex(df_l: pandas.DataFrame, df_r: pandas.DataFrame, on_l: pandas.DataFra
 
     right_data_ = df_r.loc[right_data_idx].reset_index(drop=True)
     lr = len(right_data_.index)
-    right_data_.iloc[[lr - 1 - j - lmiss_count for j in range(rmiss_count)]] = None
+    if lmiss_count > 0:
+        right_data_.iloc[[lr - 1 - j - lmiss_count for j in range(rmiss_count)]] = None
 
     left_data_ = df_l.loc[left_data_idx].reset_index(drop=True)
     ll = len(left_data_.index)
-    left_data_.iloc[[ll - 1 - j for j in range(lmiss_count)]] = None
+    if rmiss_count > 0:
+        left_data_.iloc[[ll - 1 - j for j in range(lmiss_count)]] = None
 
     return left_data_, right_data_, louter, router
+
 
 def drop_outer(merged: pandas.DataFrame, louter: Set[int], router: Set[int], method: str):
     if method == 'left':
@@ -136,11 +139,12 @@ def drop_outer(merged: pandas.DataFrame, louter: Set[int], router: Set[int], met
     merged = merged[merged.index.isin(outer)]
     return merged
 
+
 def merge(left: pandas.DataFrame, right: pandas.DataFrame,
           left_key_df: pandas.DataFrame, right_key_df: pandas.DataFrame,
           how: str = 'inner', sortable_columns: List[int] = list()) -> pandas.DataFrame:
     df_left_, df_right_, louter, router = reindex(left, right, left_key_df, right_key_df,
-                                                       sortable_columns)
+                                                  sortable_columns)
     result: pandas.DataFrame = pandas.merge(df_left_, df_right_, how,
                                             left_index=True, right_index=True, copy=False)
     result: pandas.DataFrame = drop_outer(result, louter, router, how)
