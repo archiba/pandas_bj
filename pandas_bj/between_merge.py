@@ -50,9 +50,8 @@ def merge(left: pandas.DataFrame, right: pandas.DataFrame,
 def rename(left, right, left_on, right_on, suffixes=('_x', '_y')):
     left_columns = set(left.columns)
     right_columns = set(right.columns)
-    on_intersection = set(left_on) & set(right_on)
-    left_rename_targets = (left_columns - on_intersection) & right_columns
-    right_rename_targets = (right_columns - on_intersection) & left_columns
+    left_rename_targets = left_columns & right_columns
+    right_rename_targets = right_columns & left_columns
     left_renames = {lname: f'{lname}{suffixes[0]}' for lname in left_rename_targets}
     right_renames = {rname: f'{rname}{suffixes[1]}' for rname in right_rename_targets}
     return left.rename(columns=left_renames), right.rename(columns=right_renames)
