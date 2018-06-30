@@ -43,11 +43,11 @@ def merge(left: pandas.DataFrame, right: pandas.DataFrame,
                                     for i, k in enumerate(left_on)})
     right_key_df = pandas.DataFrame({i: right[k] if not isinstance(k, CustomColumn) else k(right)
                                     for i, k in enumerate(right_on)})
-    left, right = rename(left, right, left_on, right_on, suffixes)
+    left, right = rename(left, right, suffixes)
     return custom_merge(left, right, left_key_df, right_key_df, how, sort)
 
 
-def rename(left, right, left_on, right_on, suffixes=('_x', '_y')):
+def rename(left, right, suffixes=('_x', '_y')):
     left_columns = set(left.columns)
     right_columns = set(right.columns)
     left_rename_targets = left_columns & right_columns
