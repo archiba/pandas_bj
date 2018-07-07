@@ -4,7 +4,7 @@ requires = open('requirements.txt').read()
 
 setup(
     name='pandas_bj',
-    version='0.1.0',
+    version='0.1.1',
     packages=['pandas_bj'],
     url='https://github.com/archiba/pandas_bj',
     license='MIT',
