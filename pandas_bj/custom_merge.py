@@ -4,7 +4,7 @@ import pandas
 
 
 def reindex(df_l: pandas.DataFrame, df_r: pandas.DataFrame, on_l: pandas.DataFrame, on_r: pandas.DataFrame,
-            sortable_columns: List[int]) \
+            sortable_columns: List[int], eq_null: bool = False) \
         -> Tuple[pandas.DataFrame, pandas.DataFrame, Set[int], Set[int]]:
     left_data_idx = []
     right_data_idx = []
@@ -59,9 +59,19 @@ def reindex(df_l: pandas.DataFrame, df_r: pandas.DataFrame, on_l: pandas.DataFra
                 for ci in range(num_keys):
                     lv = lrow[ci + 1]
                     rv = rrow[ci + 1]
+                    lnull = pandas.isnull(lv)
+                    rnull = pandas.isnull(rv)
                     column_sort_index = sortable_column_dict.get(ci, -1)
                     if column_sort_index > -1:
                         if lv == rv:
+                            continue
+                        if lnull and rnull:
+                            if eq_null:
+                                continue
+                            bad = True
+                            continue
+                        if lnull or rnull:
+                            bad = True
                             continue
                         if lv > rv:
                             bad = True
@@ -123,7 +133,6 @@ def reindex(df_l: pandas.DataFrame, df_r: pandas.DataFrame, on_l: pandas.DataFra
     ll = len(left_data_.index)
     if rmiss_count > 0:
         left_data_.iloc[[ll - 1 - j for j in range(lmiss_count)]] = None
-
     return left_data_, right_data_, louter, router
 
 

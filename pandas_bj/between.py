@@ -39,8 +39,8 @@ class Range():
         if self.range_from is None:
             return lambda v: True
         if self.from_opened:
-            return self.range_from.__lt__
-        return self.range_from.__le__
+            return lambda v: self.range_from < v
+        return lambda v: self.range_from <= v
 
     def _get_to_comp_func(self) -> Callable[[Any], bool]:
         """
@@ -50,8 +50,8 @@ class Range():
         if self.range_to is None:
             return lambda v: True
         if self.to_opened:
-            return self.range_to.__gt__
-        return self.range_to.__ge__
+            return lambda v: self.range_to > v
+        return lambda v: self.range_to >= v
 
     def __comp_f__(self, other: 'Range'):
         # -inf:x < ???
@@ -241,17 +241,21 @@ class Between(CustomColumn):
             return False
         return True
 
+
 class GT(Between):
     def __init__(self, f: Hashable):
         super(GT, self).__init__(f, None, True, False)
+
 
 class GE(Between):
     def __init__(self, f: Hashable):
         super(GE, self).__init__(f, None, False, False)
 
+
 class LT(Between):
     def __init__(self, t: Hashable):
         super(LT, self).__init__(None, t, False, True)
+
 
 class LE(Between):
     def __init__(self, t: Hashable):

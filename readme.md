@@ -323,14 +323,14 @@ See `test/performance.py` for more information.
 
 | X record count | Y record count | use Sort | Time in sec | Joined Y record count per X |
 | :--- | :--- | --- | :--- | :--- |
-|100 | 1,000 | False | 0.1499 | 1.0 |
-|100 | 1,000 | True | 0.0614 | 1.0 |
-|1,000 | 10,000 | False | 8.1311 | 1.4669 |
-|1,000 | 10,000 | True | 0.3608 | 1.4669 |
-|10,000 | 100,000 | True | 3.843 | 6.0406 |
-|10,000 | 1,000,000 | True | 28.5253 | 51.8505 |
+|100 | 1,000 | False | 0.1776 | 1.0 |
+|100 | 1,000 | True | 0.0913 | 1.0 |
+|1,000 | 10,000 | False | 10.9851 | 1.4669 |
+|1,000 | 10,000 | True | 0.4158 | 1.4669 |
+|10,000 | 100,000 | True | 5.6312 | 6.0406 |
+|10,000 | 1,000,000 | True | 57.0484 | 51.8505 |
 
 When you need to Join `1,000,000` X records with `10,000` Y records with `BETWEEN`,
 and it is expected that `50` X records are joined per a Y record in average,
 
-pandas-bj can create result in 30 seconds.
+pandas-bj can create result in 60 seconds.

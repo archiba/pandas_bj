@@ -30,6 +30,10 @@ class TestBetweenMerge(TestCase):
             'id1': [1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3],
             'id2': [1, 1, 1, 2, 2, 1, 1, 2, 2, 2, 1, 1, 1, 2, 2],
             's': [1, 5, 2, 6, 3, 7, 4, 8, 5, 9, 6, 10, 7, 11, 8]})
+        self.df5 = pandas.DataFrame({
+            'id3': [1, 1, 1, 1, None, 2, 2, 2, None, 2, 3, 3, 3, 3, None],
+            'id4': [1, 1, 1, 2, 2, 1, 1, 2, 2, 2, 1, 1, 1, 2, 2],
+            'v': [1, 5, 2, 6, 3, 7, 4, 8, 5, 9, 6, 10, 7, 11, 8]})
 
     def test_inner_simple(self):
         result = bmerge(self.df1, self.df2, [Between('s', 'e', True, True)], ['v'])
@@ -95,9 +99,9 @@ class TestBetweenMerge(TestCase):
         for idx, row in result.iterrows():
             if pandas.isnull(row['id1']):
                 assert_false(any([row_['id1'] == row['id3'] and
-                                              row_['id2'] == row['id4'] and
-                                              row_['s'] < row['v'] < row_['e']
-                                              for idx, row_ in self.df1.iterrows()]))
+                                  row_['id2'] == row['id4'] and
+                                  row_['s'] < row['v'] < row_['e']
+                                  for idx, row_ in self.df1.iterrows()]))
             else:
                 assert_true(row['id1'] == row['id3'], f'row: {row}')
                 assert_true(row['id2'] == row['id4'], f'row: {row}')
@@ -143,7 +147,8 @@ class TestBetweenMerge(TestCase):
             assert_true(row['s'] < row['v'] and row['e'] > row['v'], f'row: {row}')
 
     def test_inner_id2ll_s(self):
-        result = bmerge(self.df1, self.df2, ['id1', 'id2', Between('s', 'e', True, True)], ['id3', 'id4', 'v'], sort=True)
+        result = bmerge(self.df1, self.df2, ['id1', 'id2', Between('s', 'e', True, True)], ['id3', 'id4', 'v'],
+                        sort=True)
         print(result)
         for idx, row in result.iterrows():
             assert_true(row['id1'] == row['id3'])
@@ -151,7 +156,8 @@ class TestBetweenMerge(TestCase):
             assert_true(row['s'] < row['v'] and row['e'] > row['v'], f'row: {row}')
 
     def test_inner_id2rr_s(self):
-        result = bmerge(self.df1, self.df2, [Between('s', 'e', True, True), 'id1', 'id2'], ['v', 'id3', 'id4'], sort=[0])
+        result = bmerge(self.df1, self.df2, [Between('s', 'e', True, True), 'id1', 'id2'], ['v', 'id3', 'id4'],
+                        sort=[0])
         print(result)
         for idx, row in result.iterrows():
             assert_true(row['id1'] == row['id3'])
@@ -159,7 +165,8 @@ class TestBetweenMerge(TestCase):
             assert_true(row['s'] < row['v'] and row['e'] > row['v'], f'row: {row}')
 
     def test_inner_id2lr_s(self):
-        result = bmerge(self.df1, self.df2, ['id1', Between('s', 'e', True, True), 'id2'], ['id3', 'v', 'id4'], sort=[1,2])
+        result = bmerge(self.df1, self.df2, ['id1', Between('s', 'e', True, True), 'id2'], ['id3', 'v', 'id4'],
+                        sort=[1, 2])
         print(result)
         for idx, row in result.iterrows():
             assert_true(row['id1'] == row['id3'])
@@ -167,7 +174,8 @@ class TestBetweenMerge(TestCase):
             assert_true(row['s'] < row['v'] and row['e'] > row['v'], f'row: {row}')
 
     def test_left_id2lr_s(self):
-        result = bmerge(self.df1, self.df2, ['id1', Between('s', 'e', True, True), 'id2'], ['id3', 'v', 'id4'], 'left', sort=[2,1])
+        result = bmerge(self.df1, self.df2, ['id1', Between('s', 'e', True, True), 'id2'], ['id3', 'v', 'id4'], 'left',
+                        sort=[2, 1])
         print(result)
         for idx, row in result.iterrows():
             if pandas.isnull(row['id3']):
@@ -181,21 +189,23 @@ class TestBetweenMerge(TestCase):
                 assert_true(row['s'] < row['v'] and row['e'] > row['v'], f'row: {row}')
 
     def test_right_id2lr_s(self):
-        result = bmerge(self.df1, self.df2, ['id1', Between('s', 'e', True, True), 'id2'], ['id3', 'v', 'id4'], 'right', [0, 2])
+        result = bmerge(self.df1, self.df2, ['id1', Between('s', 'e', True, True), 'id2'], ['id3', 'v', 'id4'], 'right',
+                        [0, 2])
         print(result)
         for idx, row in result.iterrows():
             if pandas.isnull(row['id1']):
                 assert_false(any([row_['id1'] == row['id3'] and
-                                              row_['id2'] == row['id4'] and
-                                              row_['s'] < row['v'] < row_['e']
-                                              for idx, row_ in self.df1.iterrows()]))
+                                  row_['id2'] == row['id4'] and
+                                  row_['s'] < row['v'] < row_['e']
+                                  for idx, row_ in self.df1.iterrows()]))
             else:
                 assert_true(row['id1'] == row['id3'], f'row: {row}')
                 assert_true(row['id2'] == row['id4'], f'row: {row}')
                 assert_true(row['s'] < row['v'] and row['e'] > row['v'], f'row: {row}')
 
     def test_outer_id2lr_s(self):
-        result = bmerge(self.df1, self.df2, ['id1', Between('s', 'e', True, True), 'id2'], ['id3', 'v', 'id4'], 'outer', sort=[0,2,1])
+        result = bmerge(self.df1, self.df2, ['id1', Between('s', 'e', True, True), 'id2'], ['id3', 'v', 'id4'], 'outer',
+                        sort=[0, 2, 1])
         print(result)
         for idx, row in result.iterrows():
             if pandas.isnull(row['id3']):
@@ -293,3 +303,28 @@ class TestBetweenMerge(TestCase):
             assert_true(row['id1'] == row['id3'])
             assert_true(row['id2'] == row['id4'])
             assert_true(row['e'] >= row['v'], f'row: {row}')
+
+    def test_null_id1(self):
+        result = bmerge(self.df1, self.df5, ['id1', Between('s', 'e', True, True)], ['id3', 'v'])
+        print(result)
+        for idx, row in result.iterrows():
+            assert_true(row['id1'] == row['id3'])
+            assert_true(row['s'] < row['v'] and row['e'] > row['v'], f'row: {row}')
+
+    def test_null_id1l(self):
+        result = bmerge(self.df1, self.df5, ['id1', Between('s', 'e', True, True)], ['id3', 'v'], how='left')
+        print(result)
+        for idx, row in result.iterrows():
+            if not pandas.isnull(row['id3']):
+                assert_true(row['id1'] == row['id3'])
+                assert_true(row['s'] <= row['v'], f'row: {row}')
+                assert_true(row['e'] >= row['v'], f'row: {row}')
+
+    def test_null_id1l_opposite(self):
+        result = bmerge(self.df5, self.df1, ['id3', 'v'], ['id1', Between('s', 'e', True, True)], how='inner')
+        print(result)
+        for idx, row in result.iterrows():
+            if not pandas.isnull(row['id3']):
+                assert_true(row['id1'] == row['id3'])
+                assert_true(row['s'] <= row['v'], f'row: {row}')
+                assert_true(row['e'] >= row['v'], f'row: {row}')
