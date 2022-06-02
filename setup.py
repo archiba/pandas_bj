@@ -1,10 +1,13 @@
 from setuptools import setup
 
-requires = open('requirements.txt').read()
+requires = """
+numpy>=1.14.0
+pandas>=0.22.0
+"""
 
 setup(
     name='pandas_bj',
-    version='0.1.1',
+    version='0.1.3',
     packages=['pandas_bj'],
     url='https://github.com/archiba/pandas_bj',
     license='MIT',

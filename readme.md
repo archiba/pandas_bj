@@ -1,8 +1,9 @@
 # Pandas BETWEEN JOIN
 
-This is library that provides efficient way to use `JOIN` with comparison.
+This library provides efficient way to `JOIN` pandas dataframes with gt/lt-comparison-based process, 
+while pandas' default merge only applies hash-comparison-based process.
 
-In this library, supported comparison conditions are:
+This library supports more SQL-ish joining flexibility like below:
 
 - `JOIN yyy WHERE yyy.a BETWEEN xxx.b AND xxx.c`
 - `JOIN yyy WHERE yyy.a > xxx.b`
@@ -14,12 +15,11 @@ Please refer [Performance](#performance) if you need performance information.
 
 # Latest version
 
-0.0.2
+0.1.3
 
 # Requirements
 
 - python >= 3.6
-- nose >= 1.3.7
 - numpy >= 1.14.0
 - pandas >= 0.22.0
 
@@ -30,7 +30,7 @@ pip install pandas-bj
 ```
 
 # How to use
-For BETWEEN,
+You can do `JOIN WHERE BETWEEN`-ish merging using pandas_bj with codes like: 
 
 ```python
 import pandas_bj
@@ -87,7 +87,7 @@ print(result)
 
 ```
 
-Use `sort` for more performance.
+Use `sort` option for better performance.
 
 ```python
 result = pandas_bj.merge(
@@ -98,7 +98,7 @@ result = pandas_bj.merge(
 )
 ```
 
-For other conditions,
+Also, we provide dataframe mergin using greater-than, less-than, greater-than-equal, less-than-equal expression.
 
 ```python
 # WHERE xxx.id1 = yyy.id3 AND
@@ -291,6 +291,10 @@ LE
 33  14.0  3.0  2.0  7.0  3.0  2.0   8.0
 ```
 
+# Notice
+pandas_bj only supports dataframe with RangeIndex. 
+Make sure your dataframes have RangeIndex, and if you not then use reset_index() to make it so.
+
 # Options
 
 #### how
@@ -330,7 +334,5 @@ See `test/performance.py` for more information.
 |10,000 | 100,000 | True | 5.6312 | 6.0406 |
 |10,000 | 1,000,000 | True | 57.0484 | 51.8505 |
 
-When you need to Join `1,000,000` X records with `10,000` Y records with `BETWEEN`,
-and it is expected that `50` X records are joined per a Y record in average,
-
-pandas-bj can create result in 60 seconds.
+The result shows that if you want to join  `10,000` rows Y with `1,000,000` rows X, and it is expected that 
+`50` X for each Y record in average, then pandas-bj can finish process in 60 seconds.
