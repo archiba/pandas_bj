@@ -1,7 +1,28 @@
 from unittest import TestCase
 
 import pandas
-from nose.tools import assert_true, assert_false, raises
+
+
+def assert_true(exp1, msg=""):
+    assert exp1, msg
+
+
+def assert_false(exp1, msg=""):
+    assert not exp1, msg
+
+
+def raises(exception, msg=""):
+    def _raises(f):
+        def wrapper(*args, **kwargs):
+            raised = False
+            try:
+                f(*args, **kwargs)
+            except exception:
+                raised = True
+            assert raised, msg
+        return wrapper
+    return _raises
+
 
 from pandas_bj.between import Between, GT, GE, LT, LE
 from pandas_bj.between_merge import merge as bmerge
@@ -34,6 +55,17 @@ class TestBetweenMerge(TestCase):
             'id3': [1, 1, 1, 1, None, 2, 2, 2, None, 2, 3, 3, 3, 3, None],
             'id4': [1, 1, 1, 2, 2, 1, 1, 2, 2, 2, 1, 1, 1, 2, 2],
             'v': [1, 5, 2, 6, 3, 7, 4, 8, 5, 9, 6, 10, 7, 11, 8]})
+        self.df6 = pandas.DataFrame({
+            'id1': [1, 2, 3, 4, 5, 6, 7, 8, 9, None],
+            'f': [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+            't': [3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+            'v': [10, 11, 12, 13, 14, 15, 16, 17, 18, 19]
+        })
+        self.df7 = pandas.DataFrame({
+            'id1': [1, 3, 5, 7, 9, 11, 13],
+            'id2': [2, 3, 8, 8, 7, 5, 6],
+            'v2': [101, 111, 121, 131, 141, 151, 161]
+        })
 
     def test_inner_simple(self):
         result = bmerge(self.df1, self.df2, [Between('s', 'e', True, True)], ['v'])
@@ -45,7 +77,7 @@ class TestBetweenMerge(TestCase):
         result = bmerge(self.df1, self.df2, ['id1', Between('s', 'e', True, True)], ['id3', 'v'])
         print(result)
         for idx, row in result.iterrows():
-            assert_true(row['id1'] == row['id3'])
+            assert_true(row['id1'] == row['id3'], row['id1'] == row['id3'])
             assert_true(row['s'] < row['v'] and row['e'] > row['v'], f'row: {row}')
 
     def test_inner_id1r(self):
@@ -328,3 +360,8 @@ class TestBetweenMerge(TestCase):
                 assert_true(row['id1'] == row['id3'])
                 assert_true(row['s'] <= row['v'], f'row: {row}')
                 assert_true(row['e'] >= row['v'], f'row: {row}')
+
+    def test_left_20220603(self):
+        result = bmerge(self.df6, self.df7, ['id1', Between('f', 't')], ['id1', 'id2'], how='left')
+        print(result)
+        assert len(result) == 10

@@ -1,6 +1,7 @@
 from typing import Union, Hashable, List
 
 import pandas
+from pandas import RangeIndex
 
 from pandas_bj.between import CustomColumn
 from pandas_bj.custom_merge import merge as custom_merge
@@ -11,6 +12,9 @@ how_types = {'inner', 'outer', 'left', 'right'}
 def merge(left: pandas.DataFrame, right: pandas.DataFrame,
           left_on: Union[Hashable, List[Hashable]], right_on: Union[Hashable, List[Hashable]],
           how: str = 'inner', sort: Union[bool, List[int]] = False, suffixes=('_x', '_y')):
+    assert isinstance(left.index, RangeIndex), "pandas_bj only supports RangeIndex-ed dataframe as input."
+    assert isinstance(right.index, RangeIndex), "pandas_bj only supports RangeIndex-ed dataframe as input."
+
     if not isinstance(left_on, list):
         left_on = [left_on]
     if not isinstance(right_on, list):

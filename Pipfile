@@ -1,0 +1,14 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+nose = ">=1.3.7"
+numpy = ">=1.14.0"
+pandas = ">=0.22.0"
+
+[dev-packages]
+
+[requires]
+python_version = "3.10"
